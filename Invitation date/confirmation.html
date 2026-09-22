@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Date Confirmation</title>
+    <style>
+      :root {
+        --bg: #101010;
+        --panel: #181818;
+        --panel-soft: #1f1f1f;
+        --muted: #b3b3b3;
+        --text: #f5f5f5;
+        --green: #1ed760;
+        --pink: #f26c8e;
+        --pink-soft: rgba(242, 108, 142, 0.2);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, #1a1a1a 0%, #101010 100%);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .background-hearts {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .background-heart {
+        position: absolute;
+        font-size: 1.4rem;
+        opacity: 0.35;
+        animation: floatHeart linear infinite;
+      }
+
+      @keyframes floatHeart {
+        0% {
+          transform: translateY(100vh) scale(0.75) rotate(0deg);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(-15vh) scale(1.4) rotate(18deg);
+          opacity: 0;
+        }
+      }
+
+      .player {
+        position: relative;
+        z-index: 1;
+        width: min(360px, 92vw);
+        background: linear-gradient(180deg, rgba(242,108,142,0.34), rgba(26,26,26,0.96));
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 22px;
+        padding: 14px 14px 12px;
+        box-shadow: 0 18px 42px rgba(0,0,0,0.4);
+        animation: cardPop 0.8s ease-out;
+      }
+
+      @keyframes cardPop {
+        0% {
+          transform: scale(0.92) translateY(16px);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .screenshot-note {
+        margin-top: 14px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(242, 108, 142, 0.12);
+        border: 1px solid rgba(242, 108, 142, 0.22);
+        color: #ffd8e4;
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .sticker-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .album-art {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #f7d5d7, #d9a1b4 35%, #7a5168 100%);
+        display: grid;
+        place-items: center;
+        font-size: 2.2rem;
+        box-shadow: inset 0 0 20px rgba(255,255,255,0.15);
+        flex-shrink: 0;
+        animation: pulseHeart 2.4s ease-in-out infinite;
+      }
+
+      @keyframes pulseHeart {
+        0%, 100% {
+          transform: scale(1);
+          box-shadow: inset 0 0 20px rgba(255,255,255,0.15), 0 0 0 rgba(242,108,142,0.2);
+        }
+        50% {
+          transform: scale(1.08);
+          box-shadow: inset 0 0 20px rgba(255,255,255,0.15), 0 0 18px rgba(242,108,142,0.55);
+        }
+      }
+
+      .track-meta {
+        flex: 1;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      h1 {
+        margin: 6px 0 4px;
+        font-size: clamp(1.35rem, 4vw, 2rem);
+        letter-spacing: -0.05em;
+      }
+
+      .artist {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .status {
+        margin-top: 14px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(30, 215, 96, 0.12);
+        border: 1px solid rgba(30, 215, 96, 0.28);
+        color: #dfffe8;
+        font-weight: 600;
+        font-size: 0.82rem;
+      }
+
+      .details {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.8rem;
+      }
+
+      .detail-row span {
+        color: var(--muted);
+      }
+
+      .detail-row strong {
+        font-weight: 600;
+      }
+
+      .audio-wrap {
+        display: block;
+        margin: 0 0 14px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
+        padding: 12px 12px 10px;
+      }
+
+      audio {
+        width: 100%;
+        display: block;
+        outline: none;
+      }
+
+      a {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background-hearts" aria-hidden="true" id="backgroundHearts"></div>
+
+    <main class="player" aria-live="polite">
+      <div class="sticker-header">
+        <div class="album-art" aria-label="Album art">🎉</div>
+
+        <div class="track-meta">
+          <div class="label">Confirmed</div>
+          <h1 id="songTitle">Date is set</h1>
+          <div class="artist">You and me 💖</div>
+        </div>
+      </div>
+
+      <div class="status">Date confirmed ✨</div>
+
+      <div class="screenshot-note">Please screenshot this confirmation and send it to me 💖</div>
+
+      <div class="details">
+        <div class="detail-row">
+          <span>Her choice</span>
+          <strong id="choiceValue">Selected plan</strong>
+        </div>
+        <div class="detail-row">
+          <span>Plan</span>
+          <strong id="planValue">Selected plan</strong>
+        </div>
+        <div class="detail-row">
+          <span>Date</span>
+          <strong id="dateValue">Not set</strong>
+        </div>
+        <div class="detail-row">
+          <span>Location</span>
+          <strong id="locationValue">Not set</strong>
+        </div>
+      </div>
+
+      <div class="player-bar">
+        <div class="progress"><div class="progress-inner"></div></div>
+        <div class="time-row"><span>1:49</span><span>3:03</span></div>
+      </div>
+    </main>
+
+    <script>
+      function readParam(name, fallback) {
+        const value = new URLSearchParams(window.location.search).get(name);
+        return value && value.trim() ? value : fallback;
+      }
+
+      function createHeartBackground() {
+        const container = document.getElementById('backgroundHearts');
+        const hearts = ['💗', '💖', '💕', '💘', '💞'];
+
+        for (let i = 0; i < 20; i++) {
+          const heart = document.createElement('span');
+          heart.className = 'background-heart';
+          heart.textContent = hearts[i % hearts.length];
+          heart.style.left = `${Math.random() * 100}%`;
+          heart.style.animationDelay = `${(Math.random() * 4).toFixed(2)}s`;
+          heart.style.animationDuration = `${7 + Math.random() * 8}s`;
+          heart.style.fontSize = `${0.8 + Math.random() * 1.5}rem`;
+          container.appendChild(heart);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        createHeartBackground();
+
+        const selected = readParam('selected', 'Selected plan') || readParam('choice', 'Selected plan');
+        const date = readParam('date', 'Not set');
+        const location = readParam('location', 'Not set');
+
+        const choiceValue = document.getElementById('choiceValue');
+        const planValue = document.getElementById('planValue');
+        const dateValue = document.getElementById('dateValue');
+        const locationValue = document.getElementById('locationValue');
+
+        if (choiceValue) choiceValue.textContent = selected;
+        if (planValue) planValue.textContent = selected;
+        if (dateValue) dateValue.textContent = date;
+        if (locationValue) locationValue.textContent = location;
+      });
+    </script>
+  </body>
+</html>
